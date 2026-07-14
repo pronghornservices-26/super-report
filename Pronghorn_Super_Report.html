@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+// Auto-redirect to hosted version if opened as local file
+(function(){
+  if (window.location.protocol === 'file:') {
+    window.location.replace('https://pronghornservices-26.github.io/super-report/');
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Weekly Summary">
+<meta name="theme-color" content="#3D4451">
+<title>Weekly Superintendent Summary — Pronghorn Services</title>
+<style>
+:root{
+  --dirt:#8B6914;--dirt-dk:#5C4509;--dirt-lt:#C4952A;
+  --sand:#F7F3EA;--concrete:#3D4451;--concrete-lt:#6B7280;
+  --border:#D9CEB0;--red:#C53030;--green:#1A6640;--blue:#1D4ED8;
+  --blue-lt:#EFF6FF;--radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:-webkit-fill-available;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,'Helvetica Neue',system-ui,sans-serif;background:var(--sand);
+  color:#1a1a1a;min-height:100vh;padding-bottom:calc(env(safe-area-inset-bottom,0px)+40px);font-size:16px}
+/* HEADER */
+.hdr{background:var(--concrete);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.hdr-brand{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--dirt-lt);text-transform:uppercase}
+.hdr-title{font-size:18px;font-weight:800;margin-top:2px}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+/* HOW-TO */
+.how-to{background:var(--blue-lt);border:1.5px solid #93c5fd;border-radius:9px;padding:11px 13px;
+  margin:12px 12px 0;font-size:12px;line-height:1.6;color:#1e3a8a}
+.how-to strong{display:block;margin-bottom:3px;font-size:13px}
+/* SECTIONS */
+.sec{margin:12px 12px 0}
+.sec-hdr{background:var(--concrete);color:#fff;border-radius:10px 10px 0 0;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.sec-icon{font-size:16px}
+.sec-title{font-size:13px;font-weight:700}
+.sec-body{background:#fff;border:1.5px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:14px}
+/* FORM */
+.fg{margin-bottom:12px}.fg:last-child{margin-bottom:0}
+label{display:block;font-size:10px;font-weight:700;color:var(--concrete-lt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input,select,textarea{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:16px;background:#fff;color:#1a1a1a;-webkit-appearance:none;appearance:none;font-family:inherit;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--dirt);box-shadow:0 0 0 3px rgba(139,105,20,.12)}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* SCORECARD */
+.scorecard-area{background:var(--sand);border:1.5px solid var(--border);border-radius:9px;padding:12px;margin-bottom:10px}
+.scorecard-area:last-child{margin-bottom:0}
+.area-label{font-size:14px;font-weight:700;color:var(--concrete);margin-bottom:8px}
+.status-row{display:flex;gap:8px;margin-bottom:10px}
+.s-btn{flex:1;padding:10px 6px;border:2px solid var(--border);border-radius:7px;font-size:13px;font-weight:700;
+  cursor:pointer;text-align:center;background:#fff;transition:all .15s;-webkit-appearance:none}
+.s-btn.G.on{background:var(--green);color:#fff;border-color:var(--green)}
+.s-btn.Y.on{background:#D97706;color:#fff;border-color:#D97706}
+.s-btn.R.on{background:var(--red);color:#fff;border-color:var(--red)}
+.s-btn:active{opacity:.7}
+/* SUBMIT */
+.submit-sec{margin:14px 12px 0}
+.big-btn{display:block;width:100%;padding:17px;border:none;border-radius:var(--radius);
+  font-size:16px;font-weight:800;cursor:pointer;text-align:center;-webkit-appearance:none;margin-bottom:10px}
+.send-btn{background:var(--dirt);color:#fff}
+.send-btn:active{background:var(--dirt-dk)}
+.copy-btn{background:#fff;color:var(--concrete);border:2px solid var(--concrete)}
+/* TOAST */
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;
+  transform:translateX(-50%) translateY(16px);background:var(--concrete);color:#fff;
+  padding:11px 18px;border-radius:22px;font-size:14px;font-weight:600;
+  opacity:0;transition:all .22s;z-index:9999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-brand">Pronghorn Services</div>
+  <div class="hdr-title">Weekly Superintendent Summary</div>
+  <div class="hdr-sub">Complete and submit by end of day Friday</div>
+</div>
+
+<div class="how-to">
+  <strong>How to submit your weekly report:</strong>
+  1. Fill out this form &nbsp;
+  2. Tap <strong>Copy Import Code</strong> &rarr; paste into new email to Paul &nbsp;
+  3. Tap <strong>Send Summary Email</strong> for the readable version<br>
+  <span style="margin-top:4px;display:block">
+    <strong>iPhone:</strong> Tap Share (&boxur;&nearr;) &rarr; Add to Home Screen &nbsp;|&nbsp;
+    <strong>Android:</strong> Tap &vellip; menu &rarr; Add to Home Screen
+  </span>
+</div>
+
+<!-- PROJECT & PERIOD -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-icon">📁</span><span class="sec-title">Project & Reporting Period</span></div>
+  <div class="sec-body">
+    <div class="fg">
+      <label>Project</label>
+      <select id="project" onchange="onProjectChange()">
+        <option value="">— Select Project —</option>
+      </select>
+    </div>
+    <div class="two">
+      <div class="fg" style="margin:0"><label>Week Ending (Friday)</label><input type="date" id="week-ending"></div>
+      <div class="fg" style="margin:0"><label>Superintendent</label><input type="text" id="super-name" placeholder="Your name"></div>
+    </div>
+    <div class="two" style="margin-top:10px">
+      <div class="fg" style="margin:0"><label>PM / GM</label><input type="text" id="pm-name" value="Paul Holton"></div>
+      <div class="fg" style="margin:0"><label>Weather This Week</label><input type="text" id="weather" placeholder="e.g. Hot/Sunny, one rain day"></div>
+    </div>
+    <div class="fg" style="margin-top:12px">
+      <label>Weekly Summary (2–3 sentences — overall picture of where the project stands)</label>
+      <textarea id="summary" rows="3" placeholder="Give Paul a one-paragraph picture of where the project stands this week..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- SCORECARD -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-icon">📊</span><span class="sec-title">Weekly Scorecard</span></div>
+  <div class="sec-body">
+    <p style="font-size:11px;color:var(--concrete-lt);margin-bottom:12px">
+      Tap G / Y / R for each area &nbsp; <strong style="color:var(--green)">G = On Track</strong> &nbsp;
+      <strong style="color:#D97706">Y = Watch / Concern</strong> &nbsp;
+      <strong style="color:var(--red)">R = Critical</strong>
+    </p>
+    <div id="scorecard"></div>
+  </div>
+</div>
+
+<!-- HOURS & PRODUCTION -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-icon">⏱</span><span class="sec-title">Production & Hours</span></div>
+  <div class="sec-body">
+    <p style="font-size:11px;color:var(--concrete-lt);background:#f9f7f2;border-radius:6px;padding:8px 10px;margin-bottom:10px">
+      Note: Hours below are from daily field reports only and have <strong>not</strong> been verified against TSheets.
+      Use TSheet actuals when reporting to ownership.
+    </p>
+    <div id="tsheet-ref" style="display:none;font-size:12px;color:var(--concrete-lt);margin-bottom:10px"></div>
+    <div class="fg">
+      <label>Work completed this week — how did actual production compare to plan?</label>
+      <textarea id="production" rows="3" placeholder="e.g. Installed 420 LF 8in DIP waterline, 3 of 4 fire hydrants set. Plan was 500 LF — running ~15% behind due to rocky subgrade at Sta 12+00..."></textarea>
+    </div>
+    <div class="fg">
+      <label>Cost overruns, low production, rework, downtime, or resource shortages?</label>
+      <textarea id="cost-concerns" rows="3" placeholder="e.g. Water phase labor tracking above estimate due to hard dig. No material overruns..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- RISKS & CHANGES -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-icon">⚠️</span><span class="sec-title">Risks & Change Management</span></div>
+  <div class="sec-body">
+    <div class="fg">
+      <label>Open field risks (utility conflicts, access, design issues, RFIs, late materials, inspection risks)</label>
+      <textarea id="risks" rows="3" placeholder="List any open risks that could affect next week's production or cost..."></textarea>
+    </div>
+    <div class="fg">
+      <label>Extra work / change events / delays logged this week</label>
+      <textarea id="changes" rows="3" placeholder="List any T&M work, change events, or delays. Note whether backup documentation was turned in..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- NEXT WEEK -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-icon">📅</span><span class="sec-title">Next Week Forecast</span></div>
+  <div class="sec-body">
+    <div class="fg">
+      <label>Planned work, manpower, equipment, materials, inspections</label>
+      <textarea id="next-week" rows="3" placeholder="e.g. Complete last fire hydrant Mon, begin storm drain at Sta 8+50 Tue–Fri. Full crew all week. CMT testing Tue..."></textarea>
+    </div>
+    <div class="fg">
+      <label>Support needed from Paul / office</label>
+      <textarea id="support" rows="2" placeholder="e.g. Need RFI response on storm outlet detail by Wed. Request additional pipe delivery for Thu..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT -->
+<div class="submit-sec">
+  <div class="fg" style="margin-bottom:10px">
+    <label>Send To</label>
+    <input type="email" id="send-to" value="pholton@pronghornservices.com" inputmode="email">
+  </div>
+  <button class="big-btn copy-btn" onclick="copyImportCode()">📋 Step 1 — Copy Import Code &amp; Email to Paul</button>
+  <button class="big-btn send-btn" onclick="sendEmail()">📧 Step 2 — Send Readable Summary</button>
+</div>
+
+<div style="height:20px"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── BAKED PROJECT DATA ────────────────────────────────────────────────────────
+const BAKED_PROJECTS = [{"key":"Perkinsville 44 (2026-01)","name":"Perkinsville 44","num":"2026-01","superintendent":"Steven Pressley","pm":"Paul Holton"},{"key":"Tapadero (2026-02)","name":"Tapadero","num":"2026-02","superintendent":"","pm":"Paul Holton"}];
+
+const SCORECARD_AREAS = [
+  {id:'production', label:'Production'},
+  {id:'schedule',   label:'Schedule'},
+  {id:'safety',     label:'Safety'},
+  {id:'quality',    label:'Quality'},
+  {id:'subs',       label:'Subcontractors'},
+  {id:'owner',      label:'Owner / Inspector'},
+];
+
+const statusState = {};
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Set week-ending to this Friday
+  const today = new Date();
+  const diff = (5 - today.getDay() + 7) % 7 || 7;
+  const friday = new Date(today);
+  friday.setDate(today.getDate() + diff);
+  document.getElementById('week-ending').value = friday.toISOString().slice(0,10);
+
+  // Populate projects
+  const sel = document.getElementById('project');
+  BAKED_PROJECTS.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.key; o.textContent = p.key;
+    sel.appendChild(o);
+  });
+
+  buildScorecard();
+});
+
+function onProjectChange() {
+  const key = document.getElementById('project').value;
+  const proj = BAKED_PROJECTS.find(p => p.key === key);
+  if (!proj) return;
+  if (proj.superintendent) document.getElementById('super-name').value = proj.superintendent;
+  if (proj.pm) document.getElementById('pm-name').value = proj.pm;
+}
+
+// ── SCORECARD ─────────────────────────────────────────────────────────────────
+function buildScorecard() {
+  const cont = document.getElementById('scorecard');
+  cont.innerHTML = SCORECARD_AREAS.map(area => `
+    <div class="scorecard-area">
+      <div class="area-label">${area.label}</div>
+      <div class="status-row">
+        <button class="s-btn G" onclick="setStatus('${area.id}','G',this)">G &mdash; On Track</button>
+        <button class="s-btn Y" onclick="setStatus('${area.id}','Y',this)">Y &mdash; Watch</button>
+        <button class="s-btn R" onclick="setStatus('${area.id}','R',this)">R &mdash; Critical</button>
+      </div>
+      <div class="fg" style="margin-bottom:6px">
+        <label>What happened this week</label>
+        <textarea id="sc-this-${area.id}" rows="2" placeholder="Brief description..."></textarea>
+      </div>
+      <div class="fg">
+        <label>Action / next week</label>
+        <textarea id="sc-next-${area.id}" rows="2" placeholder="What changes or continues..."></textarea>
+      </div>
+    </div>`).join('');
+}
+
+function setStatus(area, val, btn) {
+  statusState[area] = val;
+  btn.closest('.status-row').querySelectorAll('.s-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function g(id) { return document.getElementById(id); }
+function val(id) { return (g(id)?.value || '').trim(); }
+
+function validate() {
+  if (!val('project')) { toast('Please select a project'); return false; }
+  if (!val('week-ending')) { toast('Please enter the week ending date'); return false; }
+  if (!val('super-name')) { toast('Please enter your name'); return false; }
+  if (!val('summary')) { toast('Please enter the weekly summary'); return false; }
+  return true;
+}
+
+// ── BUILD PAYLOAD ─────────────────────────────────────────────────────────────
+function buildPayload() {
+  const scorecard = SCORECARD_AREAS.map(a => ({
+    area: a.label,
+    status: statusState[a.id] || '',
+    thisWeek: val('sc-this-'+a.id),
+    nextWeekAction: val('sc-next-'+a.id)
+  }));
+  const overallStatus = scorecard.some(s=>s.status==='R') ? 'R'
+    : scorecard.some(s=>s.status==='Y') ? 'Y'
+    : scorecard.every(s=>s.status==='G') ? 'G' : '';
+
+  return {
+    _import: true,
+    _type: 'weeklyReport',
+    _version: 1,
+    project: val('project'),
+    weekEnding: val('week-ending'),
+    superintendent: val('super-name'),
+    pm: val('pm-name'),
+    weather: val('weather'),
+    summary: val('summary'),
+    overallStatus,
+    scorecard,
+    productionSummary: val('production'),
+    costConcerns: val('cost-concerns'),
+    risks: val('risks'),
+    changeEvents: val('changes'),
+    nextWeekPlan: val('next-week'),
+    supportNeeded: val('support'),
+    submittedDate: new Date().toISOString().slice(0,10),
+    reviewedBy: '',
+    reviewedDate: '',
+    followUpMeetingDate: '',
+    pmNotes: ''
+  };
+}
+
+// ── BUILD READABLE SUMMARY (short — stays under email body limit) ──────────────
+function buildSummary(p) {
+  const sLabel = {G:'GREEN - On Track', Y:'YELLOW - Watch Items', R:'RED - Critical', '':'Not set'};
+  const sChar  = {G:'[G]', Y:'[Y]', R:'[R]', '':'[?]'};
+  const L = [];
+  L.push('PRONGHORN SERVICES — WEEKLY SUPERINTENDENT SUMMARY');
+  L.push('===================================================');
+  L.push('Project:     ' + (p.project||'—'));
+  L.push('Week Ending: ' + (p.weekEnding||'—'));
+  L.push('Super:       ' + (p.superintendent||'—'));
+  L.push('PM / GM:     ' + (p.pm||'—'));
+  L.push('Weather:     ' + (p.weather||'—'));
+  L.push('Overall:     ' + (sLabel[p.overallStatus]||'—'));
+  L.push('');
+  L.push('SUMMARY');
+  L.push(p.summary||'—');
+  L.push('');
+  L.push('SCORECARD');
+  (p.scorecard||[]).forEach(s => {
+    if (s.thisWeek || s.status) {
+      L.push(sChar[s.status||''] + ' ' + s.area + ': ' + (s.thisWeek||'—'));
+      if (s.nextWeekAction) L.push('   Next: ' + s.nextWeekAction);
+    }
+  });
+  if (p.productionSummary) { L.push(''); L.push('PRODUCTION'); L.push(p.productionSummary); }
+  if (p.costConcerns)      { L.push(''); L.push('COST CONCERNS'); L.push(p.costConcerns); }
+  if (p.risks)             { L.push(''); L.push('OPEN RISKS'); L.push(p.risks); }
+  if (p.changeEvents)      { L.push(''); L.push('CHANGE EVENTS'); L.push(p.changeEvents); }
+  if (p.nextWeekPlan)      { L.push(''); L.push('NEXT WEEK'); L.push(p.nextWeekPlan); }
+  if (p.supportNeeded)     { L.push(''); L.push('SUPPORT NEEDED'); L.push(p.supportNeeded); }
+  L.push('');
+  L.push('===================================================');
+  L.push('IMPORT CODE: See separate email');
+  L.push('(Paul: paste import code into job costing tool');
+  L.push(' Backup & Export tab > Import Weekly Superintendent Report)');
+  return L.join('\n');
+}
+
+// ── COPY IMPORT CODE ──────────────────────────────────────────────────────────
+function copyImportCode() {
+  if (!validate()) return;
+  const code = '=== BEGIN SUPER IMPORT ===\n' + JSON.stringify(buildPayload()) + '\n=== END SUPER IMPORT ===';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code)
+      .then(() => toast('Import code copied — paste into a new email to Paul'))
+      .catch(() => fallbackCopy(code));
+  } else { fallbackCopy(code); }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;font-size:16px';
+  document.body.appendChild(ta);
+  ta.focus();
+  const range = document.createRange();
+  range.selectNodeContents(ta);
+  const sel = window.getSelection();
+  sel.removeAllRanges(); sel.addRange(range);
+  ta.setSelectionRange(0, 999999);
+  try { document.execCommand('copy'); toast('Import code copied'); }
+  catch(e) { alert('Could not auto-copy. Please manually select and copy the text.'); }
+  document.body.removeChild(ta);
+}
+
+// ── SEND EMAIL ────────────────────────────────────────────────────────────────
+function sendEmail() {
+  if (!validate()) return;
+  const p = buildPayload();
+  const to = val('send-to') || 'pholton@pronghornservices.com';
+  const subject = encodeURIComponent('Weekly Super Summary — ' + p.project + ' — Week Ending ' + p.weekEnding + ' — ' + p.superintendent);
+  const body = encodeURIComponent(buildSummary(p));
+  window.location.href = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
+  toast('Opening email app...');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
