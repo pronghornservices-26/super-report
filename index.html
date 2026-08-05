@@ -3,12 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <script>
-// Auto-redirect to hosted version if opened as local file
-(function(){
-  if (window.location.protocol === 'file:') {
-    window.location.replace('https://pronghornservices-26.github.io/super-report/');
-  }
-})();
+// Auto-redirect removed: it made any locally opened copy jump to the published
+// site, so new builds looked like "the old version". This file now runs itself.
+window.PH_BUILD = 'v2 \u00b7 2026-08-05';
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -33,6 +30,11 @@ body{font-family:-apple-system,'Helvetica Neue',system-ui,sans-serif;background:
 .hdr-brand{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--dirt-lt);text-transform:uppercase}
 .hdr-title{font-size:18px;font-weight:800;margin-top:2px}
 .hdr-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.hdr-build{font-size:9px;font-weight:700;color:var(--dirt-lt);letter-spacing:.08em;
+  margin-top:3px;text-transform:uppercase}
+.localbar{background:#FEF3C7;border-bottom:1.5px solid #F59E0B;color:#78350F;
+  font-size:11px;line-height:1.5;padding:8px 12px;text-align:center}
+.localbar b{font-weight:800}
 /* HOW-TO */
 .how-to{background:var(--blue-lt);border:1.5px solid #93c5fd;border-radius:9px;padding:11px 13px;
   margin:12px 12px 0;font-size:12px;line-height:1.6;color:#1e3a8a}
@@ -85,6 +87,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="hdr-brand">Pronghorn Services</div>
   <div class="hdr-title">Weekly Superintendent Summary</div>
   <div class="hdr-sub">Complete and submit by end of day Friday</div>
+  <div class="hdr-build" id="hdr-build"></div>
 </div>
 
 <div class="how-to">
@@ -110,7 +113,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     </div>
     <div class="two">
       <div class="fg" style="margin:0"><label>Week Ending (Friday)</label><input type="date" id="week-ending"></div>
-      <div class="fg" style="margin:0"><label>Superintendent</label><input type="text" id="super-name" placeholder="Your name"></div>
+      <div class="fg" style="margin:0"><label>Superintendent</label>
+        <select id="super-name" onchange="onSuperChange()"></select>
+        <input type="text" id="super-other" placeholder="Type your name" style="display:none;margin-top:6px"></div>
     </div>
     <div class="two" style="margin-top:10px">
       <div class="fg" style="margin:0"><label>PM / GM</label><input type="text" id="pm-name" value="Paul Holton"></div>
@@ -201,7 +206,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 <script>
 // ── BAKED PROJECT DATA ────────────────────────────────────────────────────────
-const BAKED_PROJECTS = [{"key":"Perkinsville 44 (2026-01)","name":"Perkinsville 44","num":"2026-01","superintendent":"Steven Pressley","pm":"Paul Holton"},{"key":"Tapadero (2026-02)","name":"Tapadero","num":"2026-02","superintendent":"","pm":"Paul Holton"}];
+const BAKED_PROJECTS = [{"key":"Perkinsville 44 (2026-01)","name":"Perkinsville 44","num":"2026-01","supers":["Steven Pressley","Tom Summers"],"pm":"Paul Holton"},{"key":"Tapadero (2026-02)","name":"Tapadero","num":"2026-02","supers":["Tom Summers","Steven Pressley"],"pm":"Paul Holton"}];
+
+// Every name that can sign a weekly summary, used when no project is picked yet
+const ALL_SUPERS = ["Steven Pressley","Tom Summers"];
 
 const SCORECARD_AREAS = [
   {id:'production', label:'Production'},
@@ -232,14 +240,62 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   buildScorecard();
+  buildSuperList(null);
+
+  const bd = document.getElementById('hdr-build');
+  if (bd) bd.textContent = 'BUILD ' + (window.PH_BUILD || '?');
+
+  if (window.location.protocol === 'file:') {
+    const bar = document.createElement('div');
+    bar.className = 'localbar';
+    bar.innerHTML = 'Running from a saved file \u2014 <b>' + (window.PH_BUILD||'') +
+      '</b>. Changes only reach the field once this file is published to the site.';
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
 });
 
 function onProjectChange() {
   const key = document.getElementById('project').value;
   const proj = BAKED_PROJECTS.find(p => p.key === key);
+  buildSuperList(proj);
   if (!proj) return;
-  if (proj.superintendent) document.getElementById('super-name').value = proj.superintendent;
   if (proj.pm) document.getElementById('pm-name').value = proj.pm;
+}
+
+// Superintendent is a picker, not a hardcoded name — the same project can be run
+// by different supers week to week. Whoever is filling it out picks themselves.
+function buildSuperList(proj) {
+  const sel = document.getElementById('super-name');
+  if (!sel) return;
+  const prev = sel.value;
+  const names = (proj && proj.supers && proj.supers.length) ? proj.supers : ALL_SUPERS;
+  sel.innerHTML = '<option value="">— Select your name —</option>' +
+    names.map(n => '<option value="' + n + '">' + n + '</option>').join('') +
+    '<option value="__other__">Other (type name)</option>';
+  // Remember the person's own pick across a project change
+  if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+  else { try { const last = localStorage.getItem('ph_super_name');
+    if (last && [...sel.options].some(o => o.value === last)) sel.value = last; } catch(e) {}
+  }
+  onSuperChange();
+}
+
+function onSuperChange() {
+  const sel = document.getElementById('super-name');
+  const other = document.getElementById('super-other');
+  if (!sel || !other) return;
+  other.style.display = sel.value === '__other__' ? 'block' : 'none';
+  if (sel.value && sel.value !== '__other__') {
+    try { localStorage.setItem('ph_super_name', sel.value); } catch(e) {}
+  }
+}
+
+function superName() {
+  const sel = document.getElementById('super-name');
+  if (!sel) return '';
+  if (sel.value && sel.value !== '__other__') return sel.value;
+  const other = document.getElementById('super-other');
+  return other ? other.value.trim() : '';
 }
 
 // ── SCORECARD ─────────────────────────────────────────────────────────────────
@@ -277,7 +333,7 @@ function val(id) { return (g(id)?.value || '').trim(); }
 function validate() {
   if (!val('project')) { toast('Please select a project'); return false; }
   if (!val('week-ending')) { toast('Please enter the week ending date'); return false; }
-  if (!val('super-name')) { toast('Please enter your name'); return false; }
+  if (!superName()) { toast('Please select your name'); return false; }
   if (!val('summary')) { toast('Please enter the weekly summary'); return false; }
   return true;
 }
@@ -300,7 +356,7 @@ function buildPayload() {
     _version: 1,
     project: val('project'),
     weekEnding: val('week-ending'),
-    superintendent: val('super-name'),
+    superintendent: superName(),
     pm: val('pm-name'),
     weather: val('weather'),
     summary: val('summary'),
